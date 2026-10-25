@@ -1,0 +1,5 @@
+/target
+/ctre_sim
+
+*.wpilog
+MUJOCO_LOG.TXT

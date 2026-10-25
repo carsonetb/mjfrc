@@ -1,0 +1,13 @@
+[package]
+name = "mjfrc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bevy_ecs = "0.20.0"
+derive_more = { version = "2.1.1", features = ["deref"] }
+frc = { version = "0.3.0", path = "../robot-rust", package = "robot-rust" }
+mujoco-rs = { version = "6.1", features = [
+    "viewer-ui",
+    "renderer-winit-fallback",
+] }

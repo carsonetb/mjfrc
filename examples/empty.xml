@@ -1,0 +1,6 @@
+<mujoco>
+  <compiler angle="radian"/>
+
+  <worldbody>
+  </worldbody>
+</mujoco>
