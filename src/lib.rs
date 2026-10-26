@@ -65,7 +65,7 @@ impl SimRuntime for MuJoCoRuntime {
         state.insert_resource(Data(data));
         state.insert_resource(viewer);
 
-        state.add_systems(SimulatorPeriodic, (motor_update, step).chain());
+        state.add_systems(SimulatorPeriodic, (motor_update, gyro_update, step).chain());
     }
 }
 
@@ -93,7 +93,7 @@ fn motor_update(mut data: ResourceMut<Data>) {
 
         let name = format!("{bus}:{id}");
         let Some(actuator) = data.actuator(&name) else {
-            warn!("Actuator not present in model: '{bus}:{id}'");
+            warn!("Motor not present in model: '{name}'");
             continue;
         };
         let mut actuator = actuator.view_mut(&mut data);
@@ -102,5 +102,26 @@ fn motor_update(mut data: ResourceMut<Data>) {
         output.supply_voltage = 12.0.volts();
         output.position = input.gearing * actuator.length[0].radians();
         output.velocity = input.gearing * actuator.velocity[0].radians_per_second();
+    }
+}
+
+fn gyro_update(data: ResourceMut<Data>) {
+    let inputs = &SimulatorInputs::get().gyros;
+    let mut outputs = SimulatorOutputs::get();
+
+    for ((bus, id), _) in inputs {
+        let output = outputs.gyro(bus, *id);
+
+        let name = format!("{bus}:{id}");
+        let Some(sensor) = data.sensor(&name) else {
+            warn!("Gyro not present in model: '{name}'");
+            continue;
+        };
+        let sensor = sensor.view(&data);
+
+        output.supply_voltage = 12.0.volts();
+        output.xvel = sensor.data[0].radians_per_second();
+        output.yvel = sensor.data[1].radians_per_second();
+        output.zvel = sensor.data[2].radians_per_second();
     }
 }
