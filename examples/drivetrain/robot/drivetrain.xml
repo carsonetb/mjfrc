@@ -1,0 +1,31 @@
+<mujoco>
+  <worldbody>
+    <body name="drivetrain" pos="0 0 0.5">
+      <joint type="free" />
+
+      <!-- Bumper -->
+      <geom type="box" pos="-0.3944685 0 0.1075" size="0.009525 0.403225 0.0635" rgba="0.8 0.776470588 0.71372549 1" />
+      <geom type="box" pos="0.3944685 0 0.1075" size="0.009525 0.403225 0.0635" rgba="0.8 0.776470588 0.71372549 1" />
+      <geom type="box" pos="-0.294462 -0.3944685 0.1075" size="0.0905 0.009525 0.0635" rgba="0.8 0.776470588 0.71372549 1" />
+      <geom type="box" pos="0.294462 -0.3944685 0.1075" size="0.0905 0.009525 0.0635" rgba="0.8 0.776470588 0.71372549 1" />
+      <geom type="box" pos="-0.194437 0.3944685 0.1075" size="0.1905 0.009525 0.0635" rgba="0.8 0.776470588 0.71372549 1" />
+      <geom type="box" pos="0.194437 0.3944685 0.1075" size="0.1905 0.009525 0.0635" rgba="0.8 0.776470588 0.71372549 1" />
+
+      <!-- Boxtube -->
+      <geom type="box" pos="-0.2159 -0.27305 0.073025" size="0.0127 0.10795 0.028575" rgba="0.647058824 0.647058824 0.647058824 1" />
+      <geom type="box" pos="0.2159 -0.27305 0.073025" size="0.0127 0.10795 0.028575" rgba="0.647058824 0.647058824 0.647058824 1" />
+      <geom type="box" pos="0 -0.1524 0.073025" size="0.228611025 0.0127 0.028575" rgba="0.647058824 0.647058824 0.647058824 1" />
+
+    </body>
+
+    <geom name="floor" type="plane" pos="0 0 0" size="0 0 2" material="groundplane"/>
+
+    <light pos="0 0 1.5" dir="-1 -1 -1" type="directional" />
+    <light pos="0 0 1.5" dir="0 0 -1" range="30.0" />
+  </worldbody>
+
+  <asset>
+    <texture type="2d" name="groundplane" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 .2 .3" width="300" height="300" mark="edge" markrgb=".8 .8 .8"/>
+    <material name="groundplane" texture="groundplane" texrepeat="5 5" texuniform="true" reflectance="0.2"/>
+  </asset>
+</mujoco>

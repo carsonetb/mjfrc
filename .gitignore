@@ -3,3 +3,4 @@
 
 *.wpilog
 MUJOCO_LOG.TXT
+networktables.json
