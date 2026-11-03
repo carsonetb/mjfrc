@@ -21,13 +21,7 @@ impl MuJoCoRuntime {
         }
     }
 
-    pub fn with_motor(
-        mut self,
-        name: &str,
-        joint: &str,
-        motor_type: MotorType,
-        gearing: f64,
-    ) -> Self {
+    pub fn add_motor(&mut self, name: &str, joint: &str, motor_type: MotorType, gearing: f64) {
         let plant = DCMotor::from_motor_type(motor_type);
         let actuator = self
             .spec
@@ -42,14 +36,31 @@ impl MuJoCoRuntime {
                 DcMotorConfig::default()
                     .with_resistance(plant.resistance.value)
                     .with_motorconst([plant.kt.value, 1.0 / plant.kv.value])
-                    .with_nominal([
-                        plant.nominal_voltage.value,
-                        plant.stall_torque.value,
-                        plant.free_speed.value,
-                    ])
+                    // .with_nominal([
+                    //     plant.nominal_voltage.value,
+                    //     plant.stall_torque.value,
+                    //     plant.free_speed.value,
+                    // ])
                     .with_saturation([plant.stall_torque.value, 0.0, 0.0]),
             )
             .unwrap();
+    }
+
+    pub fn with_motor(
+        mut self,
+        name: &str,
+        joint: &str,
+        motor_type: MotorType,
+        gearing: f64,
+    ) -> Self {
+        self.add_motor(name, joint, motor_type, gearing);
+        self
+    }
+
+    pub fn with_motors(mut self, motors: &[(&str, &str, MotorType, f64)]) -> Self {
+        for (name, joint, motor_type, gearing) in motors {
+            self.add_motor(name, joint, *motor_type, *gearing);
+        }
         self
     }
 }
@@ -100,8 +111,8 @@ fn motor_update(mut data: ResourceMut<Data>) {
         actuator.ctrl[0] = input.applied_voltage.value;
 
         output.supply_voltage = 12.0.volts();
-        output.position = input.gearing * actuator.length[0].radians();
-        output.velocity = input.gearing * actuator.velocity[0].radians_per_second();
+        output.position = actuator.length[0].radians();
+        output.velocity = actuator.velocity[0].radians_per_second();
     }
 }
 
