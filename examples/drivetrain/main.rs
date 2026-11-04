@@ -7,8 +7,8 @@ use frc::prelude::*;
 use frc::sim::io::MotorType;
 use mjfrc::MuJoCoRuntime;
 
-const DRIVE_PID_GAINS: PIDGains = PIDGains::new(0.7433, 0.0, 0.0);
-const STEER_PID_GAINS: PIDGains = PIDGains::new(125.0, 0.0, 0.0);
+const DRIVE_PID_GAINS: PIDGains = PIDGains::new(0.0, 0.0, 0.0);
+const STEER_PID_GAINS: PIDGains = PIDGains::new(20.0, 0.0, 0.0);
 const DRIVE_GEAR_RATIO: f64 = 5.27;
 const STEER_GEAR_RATIO: f64 = 26.09;
 
@@ -50,8 +50,8 @@ impl DrivingMotor for Mk5nDrivingMotor {
     }
 
     fn set_velocity(&mut self, velocity: AngularVelocity) {
-        self.motor
-            .set_velocity_voltage(self.control.with_velocity(velocity));
+        // self.motor
+        //     .set_velocity_voltage(self.control.with_velocity(velocity));
     }
 
     fn simulate(&mut self) {
@@ -152,6 +152,7 @@ impl Mk5nDrivetrain {
 fn drive_controller(
     mut controller: ResourceMut<XboxController>,
     mut drivetrain: ResourceMut<Mk5nDrivetrain>,
+    mut logger: ResourceMut<Logger>,
 ) {
     controller.simulate();
 
@@ -164,6 +165,17 @@ fn drive_controller(
         .kinematics
         .to_swerve_module_states(speeds, Vec2::new(0.0.meters(), 0.0.meters()));
     drivetrain.drivetrain.set_desired_states(states);
+    for (i, state) in drivetrain.drivetrain.get_states().iter().enumerate() {
+        logger.append(&format!("States/{i}"), *state);
+    }
+    for (i, state) in drivetrain
+        .drivetrain
+        .get_desired_states()
+        .iter()
+        .enumerate()
+    {
+        logger.append(&format!("TargetStates/{i}"), *state);
+    }
 }
 
 fn drive_periodic(mut drivetrain: ResourceMut<Mk5nDrivetrain>) {
@@ -176,10 +188,6 @@ fn main() {
     let mut state: State<MuJoCoRuntime> = State::new().unwrap();
     state.subscribe();
     state.set_runtime(MuJoCoRuntime::new(xml.into()).with_motors(&[
-        ("*:1", "FrontLeftDrivingMotor", MotorType::KrakenX60, 26.09),
-        ("*:2", "BackLeftDrivingMotor", MotorType::KrakenX60, 26.09),
-        ("*:3", "BackRightDrivingMotor", MotorType::KrakenX60, 26.09),
-        ("*:4", "FrontRightDrivingMotor", MotorType::KrakenX60, 26.09),
         ("*:5", "FrontLeftTurningMotor", MotorType::KrakenX60, 6.03), // TODO: Which gear ratio do we use?
         ("*:6", "BackLeftTurningMotor", MotorType::KrakenX60, 6.03),
         ("*:7", "BackRightTurningMotor", MotorType::KrakenX60, 6.03),
@@ -189,7 +197,9 @@ fn main() {
     state.insert_resource(XboxController::new(0));
 
     state.insert_resource(Mk5nDrivetrain::new());
+    // state.insert_resource(KrakenX60::new(5, "*"));
     state.add_systems(Periodic, (drive_controller, drive_periodic).chain());
+    // state.add_systems(Periodic, test);
 
     state.run();
 }

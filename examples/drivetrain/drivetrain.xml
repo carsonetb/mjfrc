@@ -1,9 +1,19 @@
 <mujoco>
-  <option integrator="implicitfast"/>
+  <compiler angle="degree" coordinate="local"/>
+  <option timestep="0.001" integrator="RK4" cone="elliptic"/>
+
+  <default>
+    <default class="visual">
+      <geom type="mesh" group="2" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom type="mesh" group="3"/>
+    </default>
+  </default>
 
   <worldbody>
-    <body name="drivetrain" pos="0 0 0.05">
-      <joint type="free" />
+    <body name="drivetrain" pos="0 0 0.5">
+      <!-- <joint type="free" /> -->
       <inertial pos="0 0 0" mass="30" diaginertia="5 5 5"/>
       <site name="gyro_site" />
 
@@ -30,7 +40,9 @@
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="FrontLeftDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
-          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" />
+          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" class="collision" />
+          <geom type="cylinder" size="0.0508 0.02" pos="0 0 0" euler="90 0 0" class="visual" />
+          <geom type="cylinder" size="0.003 0.06" pos="0 0 0" euler="0 0 0" class="visual" />
         </body>
       </body>
 
@@ -42,7 +54,9 @@
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="BackLeftDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
-          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" />
+          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" class="collision" />
+          <geom type="cylinder" size="0.0508 0.02" pos="0 0 0" euler="90 0 0" class="visual" />
+          <geom type="cylinder" size="0.003 0.06" pos="0 0 0" euler="0 0 0" class="visual" />
         </body>
       </body>
 
@@ -54,7 +68,9 @@
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="FrontRightDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
-          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" />
+          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" class="collision" />
+          <geom type="cylinder" size="0.0508 0.02" pos="0 0 0" euler="90 0 0" class="visual" />
+          <geom type="cylinder" size="0.003 0.06" pos="0 0 0" euler="0 0 0" class="visual" />
         </body>
       </body>
 
@@ -66,7 +82,9 @@
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="BackRightDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
-          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" />
+          <geom type="sphere" size="0.0508" friction="1.2 0.005 0.0001" class="collision" />
+          <geom type="cylinder" size="0.0508 0.02" pos="0 0 0" euler="90 0 0" class="visual" />
+          <geom type="cylinder" size="0.003 0.06" pos="0 0 0" euler="0 0 0" class="visual" />
         </body>
       </body>
 
@@ -86,4 +104,12 @@
   <sensor>
     <gyro name="*:20" site="gyro_site" />
   </sensor>
+
+  <actuator>
+    <dcmotor name="*:1" joint="FrontLeftDrivingMotor" gear="26.09" ctrlrange="-12.0 12.0" resistance="0.0364741641" motorconst="0.0152279635 0.00205638822" />
+    <dcmotor name="*:2" joint="BackLeftDrivingMotor" gear="26.09" ctrlrange="-12.0 12.0" resistance="0.0364741641" motorconst="0.0152279635 0.00205638822" />
+    <dcmotor name="*:3" joint="BackRightDrivingMotor" gear="26.09" ctrlrange="-12.0 12.0" resistance="0.0364741641" motorconst="0.0152279635 0.00205638822" />
+    <dcmotor name="*:4" joint="FrontRightDrivingMotor" gear="26.09" ctrlrange="-12.0 12.0" resistance="0.0364741641" motorconst="0.0152279635 0.00205638822" />
+  </actuator>
+
 </mujoco>
