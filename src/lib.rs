@@ -76,7 +76,10 @@ impl SimRuntime for MuJoCoRuntime {
         state.insert_resource(Data(data));
         state.insert_resource(viewer);
 
-        state.add_systems(SimulatorPeriodic, (motor_update, gyro_update, step).chain());
+        state.add_systems(
+            SimulatorPeriodic,
+            (motor_update, step, motor_read, gyro_update).chain(),
+        );
     }
 }
 
@@ -97,11 +100,8 @@ fn step(mut data: ResourceMut<Data>, mut viewer: ResourceMut<MjViewer>) {
 
 fn motor_update(mut data: ResourceMut<Data>) {
     let inputs = &SimulatorInputs::get().motors;
-    let mut outputs = SimulatorOutputs::get();
 
     for ((bus, id), input) in inputs {
-        let output = outputs.motor(bus, *id);
-
         let name = format!("{bus}:{id}");
         let Some(actuator) = data.actuator(&name) else {
             warn!("Motor not present in model: '{name}'");
@@ -109,6 +109,22 @@ fn motor_update(mut data: ResourceMut<Data>) {
         };
         let mut actuator = actuator.view_mut(&mut data);
         actuator.ctrl[0] = input.applied_voltage.value;
+    }
+}
+
+fn motor_read(data: ResourceMut<Data>) {
+    let inputs = &SimulatorInputs::get().motors;
+    let mut outputs = SimulatorOutputs::get();
+
+    for ((bus, id), _) in inputs {
+        let output = outputs.motor(bus, *id);
+
+        let name = format!("{bus}:{id}");
+        let Some(actuator) = data.actuator(&name) else {
+            warn!("Motor not present in model: '{name}'");
+            continue;
+        };
+        let actuator = actuator.view(&data);
 
         output.supply_voltage = 12.0.volts();
         output.position = actuator.length[0].radians();

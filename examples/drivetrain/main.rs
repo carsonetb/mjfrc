@@ -8,7 +8,7 @@ use frc::sim::io::MotorType;
 use mjfrc::MuJoCoRuntime;
 
 const DRIVE_PID_GAINS: PIDGains = PIDGains::new(0.0, 0.0, 0.0);
-const STEER_PID_GAINS: PIDGains = PIDGains::new(20.0, 0.0, 0.0);
+const STEER_PID_GAINS: PIDGains = PIDGains::new(100.0, 0.0, 0.1);
 const DRIVE_GEAR_RATIO: f64 = 5.27;
 const STEER_GEAR_RATIO: f64 = 26.09;
 
@@ -19,7 +19,11 @@ struct Mk5nDrivingMotor {
 
 impl Mk5nDrivingMotor {
     pub fn new(id: i32, bus: &'static str) -> Self {
-        let mut motor = KrakenX60::new(id, bus);
+        let mut motor = KrakenX60::new(id, bus).with_simulation_params(
+            TalonFXMotorType::KrakenX60FOC,
+            1.0,
+            0.001.moment_of_inertia(),
+        );
         motor.configurator().apply(
             TalonFXConfiguration::new()
                 .with_slot0(
@@ -66,11 +70,28 @@ struct Mk5nTurningMotor {
 
 impl Mk5nTurningMotor {
     pub fn new(id: i32, bus: &'static str) -> Self {
-        let mut motor = KrakenX60::new(id, bus);
+        let mut motor = KrakenX60::new(id, bus).with_simulation_params(
+            TalonFXMotorType::KrakenX60FOC,
+            STEER_GEAR_RATIO,
+            0.001.moment_of_inertia(),
+        );
         motor.configurator().apply(
             TalonFXConfiguration::new()
-                .with_slot0(Slot0Configs::new().with_pid(STEER_PID_GAINS))
-                .with_feedback(FeedbackConfigs::new().with_rotor_to_sensor_ratio(STEER_GEAR_RATIO)),
+                .with_slot0(
+                    Slot0Configs::new()
+                        .with_pid(STEER_PID_GAINS)
+                        .with_ks(0.1)
+                        .with_kv(2.49)
+                        .with_ka(0.0),
+                )
+                .with_feedback(
+                    FeedbackConfigs::new()
+                        .with_rotor_to_sensor_ratio(STEER_GEAR_RATIO)
+                        .with_velocity_filter_time_constant(40.0.milliseconds()),
+                )
+                .with_closed_loop_general(
+                    ClosedLoopGeneralConfigs::new().with_continuous_wrap(true),
+                ),
         );
         Self {
             motor,
@@ -157,9 +178,9 @@ fn drive_controller(
     controller.simulate();
 
     let speeds = ChassisSpeeds::new(
-        controller.left_x() * 16.8.feet_per_second(),
-        controller.left_y() * 16.8.feet_per_second(),
-        controller.right_x() * 720.0.degrees_per_second(),
+        -controller.left_y() * 16.8.feet_per_second(),
+        -controller.left_x() * 16.8.feet_per_second(),
+        -controller.right_x() * 720.0.degrees_per_second(),
     );
     let states = drivetrain
         .kinematics
@@ -188,10 +209,30 @@ fn main() {
     let mut state: State<MuJoCoRuntime> = State::new().unwrap();
     state.subscribe();
     state.set_runtime(MuJoCoRuntime::new(xml.into()).with_motors(&[
-        ("*:5", "FrontLeftTurningMotor", MotorType::KrakenX60, 6.03), // TODO: Which gear ratio do we use?
-        ("*:6", "BackLeftTurningMotor", MotorType::KrakenX60, 6.03),
-        ("*:7", "BackRightTurningMotor", MotorType::KrakenX60, 6.03),
-        ("*:8", "FrontRightTurningMotor", MotorType::KrakenX60, 6.03),
+        (
+            "*:5",
+            "FrontLeftTurningMotor",
+            MotorType::KrakenX60FOC,
+            STEER_GEAR_RATIO,
+        ), // TODO: Which gear ratio do we use?
+        (
+            "*:6",
+            "BackLeftTurningMotor",
+            MotorType::KrakenX60FOC,
+            STEER_GEAR_RATIO,
+        ),
+        (
+            "*:7",
+            "BackRightTurningMotor",
+            MotorType::KrakenX60FOC,
+            STEER_GEAR_RATIO,
+        ),
+        (
+            "*:8",
+            "FrontRightTurningMotor",
+            MotorType::KrakenX60FOC,
+            STEER_GEAR_RATIO,
+        ),
     ]));
 
     state.insert_resource(XboxController::new(0));

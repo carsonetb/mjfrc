@@ -13,7 +13,7 @@
 
   <worldbody>
     <body name="drivetrain" pos="0 0 0.5">
-      <!-- <joint type="free" /> -->
+      <joint type="free" />
       <inertial pos="0 0 0" mass="30" diaginertia="5 5 5"/>
       <site name="gyro_site" />
 
@@ -36,7 +36,7 @@
       <body pos="0.3145 -0.3145 0.051">
         <inertial pos="0 0 0" mass="0.71795491" diaginertia="0.001 0.001 0.001" />
         <joint type="slide" axis="0 0 1" stiffness="50000" damping="1000" pos="0 0 0" springref="0"/>
-        <joint name="FrontLeftTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" />
+        <joint name="FrontLeftTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" frictionloss="0.1" />
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="FrontLeftDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
@@ -50,7 +50,7 @@
       <body pos="0.3145 0.3145 0.051">
         <inertial pos="0 0 0" mass="0.71795491" diaginertia="0.001 0.001 0.001" />
         <joint type="slide" axis="0 0 1" stiffness="50000" damping="1000" pos="0 0 0" springref="0" />
-        <joint name="BackLeftTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" />
+        <joint name="BackLeftTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" frictionloss="0.1" />
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="BackLeftDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
@@ -64,7 +64,7 @@
       <body pos="-0.3145 -0.3145 0.051">
         <inertial pos="0 0 0" mass="0.71795491" diaginertia="0.001 0.001 0.001" />
         <joint type="slide" axis="0 0 1" stiffness="50000" damping="1000" pos="0 0 0" springref="0"/>
-        <joint name="FrontRightTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" />
+        <joint name="FrontRightTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" frictionloss="0.1" />
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="FrontRightDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
@@ -78,7 +78,7 @@
       <body pos="-0.3145 0.3145 0.051">
         <inertial pos="0 0 0" mass="0.71795491" diaginertia="0.001 0.001 0.001" />
         <joint type="slide" axis="0 0 1" stiffness="50000" damping="1000" pos="0 0 0" springref="0"/>
-        <joint name="BackRightTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" />
+        <joint name="BackRightTurningMotor" type="hinge" axis="0 0 1" armature="0.034" damping="3.2" frictionloss="0.1" />
         <body>
           <inertial pos="0 0 0" mass="0.5440369" diaginertia="0.001 0.001 0.001" />
           <joint name="BackRightDrivingMotor" type="hinge" axis="0 1 0" armature="0.00139" damping="0.66" />
